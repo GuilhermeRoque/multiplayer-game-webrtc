@@ -22,11 +22,11 @@
     }
 
     ```
-- Nome inválido (duplicado):
+- Credenciais inválidas:
     ```
     {
         "status": 400,
-        "message": "invalid username"
+        "message": "invalid credentials"
         "value": "guilherme_roque"
     }
 
