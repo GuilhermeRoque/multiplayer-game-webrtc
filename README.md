@@ -195,32 +195,3 @@
     }
 
     ```
-    
-
-
-Registro do Cliente no Servidor:
-
-CASO 1: Cliente registrando presença na sala e Servidor permitindo
-
-Cliente: "entrar:nome:sala"
-Servidor: "ok:TOKEN:codigo"
-
-CASO 2: Cliente registrando presença na sala e Servidor não permitindo devido ao nome do usuário (incorreto ou duplicado)
-
-Cliente: "entrar:nome:sala"
-Servidor: "nok:codigo"
-
-CASO 3: Cliente registrando presença na sala e Servidor não permitindo devido a sala estar cheia
-
-Cliente: "entrar:nome:sala"
-Servidor: "nok:codigo"
-
-CASO 4: KeepAlive (mensagem periódica)
-
-Cliente: "alive:TOKEN"
-Servidor: "ok:codigo"
-
-CASO 5: Conexão encerrada:
-
-Cliente: "fim:TOKEN"
-Servidor: "ok:codigo"
