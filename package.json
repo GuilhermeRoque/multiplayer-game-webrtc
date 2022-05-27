@@ -1,0 +1,30 @@
+{
+  "name": "smu-2022",
+  "version": "1.0.0",
+  "description": "- Descrição: Usuário envia sua identificação para o servidor que irá validar e responder com um token que deverá ser incluído nas próximas requisições. - Ex. requisição:     ```     {         \"method\": \"authenticate\",         \"value\": {             name: \"guilherme_roque\",             password: \"123456\"             },     }",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GuilhermeRoque/smu-2022.git"
+  },
+  "author": "Guilherme Roque",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GuilhermeRoque/smu-2022/issues"
+  },
+  "homepage": "https://github.com/GuilhermeRoque/smu-2022#readme",
+  "dependencies": {
+    "ejs": "^3.1.8",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "passport": "^0.6.0",
+    "passport-google-oauth": "^2.0.0",
+    "socket.io": "^4.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  }
+}
