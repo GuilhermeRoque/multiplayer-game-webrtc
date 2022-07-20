@@ -62,7 +62,7 @@ function create() {
   //  A simple background for our game
   this.add.image(400, 300, "sky");
   trilha = this.sound.add("trilha");
-  trilha.play();
+  // trilha.play();
 
   //  The platforms group contains the ground and the 2 ledges we can jump on
   platforms = this.physics.add.staticGroup();
@@ -236,11 +236,10 @@ function create() {
           localConnection
             // initiates the creation of an SDP The SDP offer includes information about any MediaStreamTrack objects already attached to the WebRTC session, codec, and options supported by the browser, and any candidates already gathered by the ICE agent
             .createOffer()
-            .then((offer) => {
-              console.log("OFFER CREATED ", offer)
+            .then((offer) => 
               //  changes the local description associated with the connection. This description specifies the properties of the local end of the connection, including the media format (session description)
               localConnection.setLocalDescription(offer)
-            })
+            )
             .then(() => {
               socket.emit(
                 "offer",
@@ -321,11 +320,11 @@ function update() {
     if (cursors.up.isDown && player1.body.touching.down) {
       player1.setVelocityY(-330);
     }
-    // this.socket.emit("estadoDoJogador", {
-    //   frame: player1.anims.getFrameName(),
-    //   x: player1.body.x + 20,
-    //   y: player1.body.y + 20,
-    // });
+    this.socket.emit("estadoDoJogador", {
+      frame: player1.anims.getFrameName(),
+      x: player1.body.x + 20,
+      y: player1.body.y + 20,
+    });
   } else if (jogador === 2) {
     if (cursors.left.isDown) {
       player2.setVelocityX(-160);
@@ -340,11 +339,11 @@ function update() {
     if (cursors.up.isDown && player2.body.touching.down) {
       player2.setVelocityY(-330);
     }
-    // this.socket.emit("estadoDoJogador", {
-    //   frame: player2.anims.getFrameName(),
-    //   x: player2.body.x + 20,
-    //   y: player2.body.y + 20,
-    // });
+    this.socket.emit("estadoDoJogador", {
+      frame: player2.anims.getFrameName(),
+      x: player2.body.x + 20,
+      y: player2.body.y + 20,
+    });
   }
 }
 
