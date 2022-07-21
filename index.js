@@ -2,8 +2,8 @@ const session = require('express-session');
 const express = require("express");
 const app = express();
 const server = require("http").Server(app);
-const io = require("socket.io")(server);
-const PORT = process.env.PORT || 3000;
+const io = require("socket.io")(server, {origins:["https://ifsc.cloud", "https://ifsc.cloud/roque/"]});
+const PORT = 5500;
 var jogadores = {
   primeiro: undefined,
   segundo: undefined,
@@ -13,6 +13,7 @@ var players = []
 
 // Disparar evento quando jogador entrar na partida
 io.on("connection", function (socket) {
+  console.log('conectou!!!!')
   if (jogadores.primeiro === undefined) {
     jogadores.primeiro = socket.id;
   } else if (jogadores.segundo === undefined) {
@@ -90,7 +91,7 @@ const GOOGLE_CLIENT_SECRET = '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';
 passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback"
+    callbackURL: "https://ifsc.cloud/roque/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
       userProfile=profile;
@@ -107,13 +108,13 @@ app.get('/auth/google/callback',
     // Successful authentication, redirect success.
     players.push(req.user._json)
     console.log("Jogadores autenticados: \n", players)
-    res.redirect('/');
+    res.redirect('/roque/');
   });
 
 // --------------------------------------------------------
 app.use((req, res, next)=>{
   if(!req.user){
-    res.redirect('/login')
+    res.redirect('/roque/login')
   }else{
     next()
   }
