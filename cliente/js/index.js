@@ -255,6 +255,7 @@ function create() {
     console.log(jogadores);
   });
 
+  // player 1 receives offer
   this.socket.on("offer", (socketId, description) => {
     remoteConnection = new RTCPeerConnection(ice_servers);
     midias
@@ -275,6 +276,7 @@ function create() {
       });
   });
 
+  // player 2 reeiver answer and then connection is established
   this.socket.on("answer", (description) => {
     localConnection.setRemoteDescription(description);
   });
