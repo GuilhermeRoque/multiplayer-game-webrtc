@@ -2,8 +2,8 @@ const session = require('express-session');
 const express = require("express");
 const app = express();
 const server = require("http").Server(app);
-const io = require("socket.io")(server);
-const PORT = process.env.PORT || 3000;
+const io = require("socket.io")(server, {origins:["https://ifsc.cloud", "https://ifsc.cloud/roque/"]});
+const PORT = 5500;
 var jogadores = {
   primeiro: undefined,
   segundo: undefined,
@@ -14,6 +14,7 @@ var players = []
 
 // Disparar evento quando jogador entrar na partida
 io.on("connection", function (socket) {
+  console.log('conectou!!!!')
   if (jogadores.primeiro === undefined) {
     jogadores.primeiro = socket.id;
   } else if (jogadores.segundo === undefined) {
@@ -61,71 +62,65 @@ io.on("connection", function (socket) {
   });
 });
 // ----------------------------------------------------------------
-// app.set('view engine', 'ejs');
+app.set('view engine', 'ejs');
 
-// app.use(session({
-//   resave: false,
-//   saveUninitialized: true,
-//   secret: 'SECRET' 
-// }));
+app.use(session({
+  resave: false,
+  saveUninitialized: true,
+  secret: 'SECRET' 
+}));
 
-// var passport = require('passport');
-// var userProfile; 
-// app.use(passport.initialize());
-// app.use(passport.session());
+var passport = require('passport');
+var userProfile; 
+app.use(passport.initialize());
+app.use(passport.session());
 
-// app.get('/login', function(req, res) {
-//   res.render('pages/auth');
-// });
-// app.get('/error', (req, res) => res.send("error logging in"));
+app.get('/login', function(req, res) {
+  res.render('pages/auth');
+});
+app.get('/error', (req, res) => res.send("error logging in"));
 
-// passport.serializeUser(function(user, cb) {
-//   cb(null, user);
-// });
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
  
-// passport.deserializeUser(function(obj, cb) {
-//   cb(null, obj);
-// });
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
 
 
 // /*  Google AUTH  */
- 
-// var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-// const GOOGLE_CLIENT_ID = '1063440433438-0mcpenptf78qa4i6vfsvo2rqu45656h0.apps.googleusercontent.com';
-// const GOOGLE_CLIENT_SECRET = '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';
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const GOOGLE_CLIENT_ID = '1063440433438-0mcpenptf78qa4i6vfsvo2rqu45656h0.apps.googleusercontent.com';
+const GOOGLE_CLIENT_SECRET = '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';
 
-// passport.use(new GoogleStrategy({
-//     clientID: GOOGLE_CLIENT_ID,
-//     clientSecret: GOOGLE_CLIENT_SECRET,
-//     callbackURL: "/auth/google/callback"
-//   },
-//   function(accessToken, refreshToken, profile, done) {
-//       userProfile=profile;
-//       return done(null, userProfile);
-//   }
-// ));
- 
-// app.get('/auth/google', 
-//   passport.authenticate('google', { scope : ['profile', 'email'] }));
- 
-// app.get('/auth/google/callback', 
-//   passport.authenticate('google', { failureRedirect: '/error' }),
-//   function(req, res) {
-//     // Successful authentication, redirect success.
-//     players.push(req.user._json)
-//     console.log("Jogadores autenticados: \n", players)
-//     res.redirect('/');
-//   });
+passport.use(new GoogleStrategy({
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: "https://ifsc.cloud/roque/auth/google/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+      userProfile=profile;
+      return done(null, userProfile);
+  }
+));
 
-// app.use((req, res, next)=>{
-//   if(!req.user){
-//     res.redirect('/login')
-//   }else{
-//     next()
-//   }
-// }) 
-// --------------------------------------------------------
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/error' }),
+  function(req, res) {
+    // Successful authentication, redirect success.
+    players.push(req.user._json)
+    console.log("Jogadores autenticados: \n", players)
+    res.redirect('/roque/');
+  });
 
+app.use((req, res, next)=>{
+  if(!req.user){
+    res.redirect('/roque/login')
+  }else{
+    next()
+  }
+}) 
 app.use(express.static("./cliente"));
   
 server.listen(PORT, () => console.log(`Server listening on port ${PORT}!`));
