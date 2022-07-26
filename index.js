@@ -33,7 +33,7 @@ io.on("connection", function (socket) {
 
   // Sinalização de áudio: atendimento da oferta
   socket.on("answer", (socketId, description) => {
-    socket.to(socketId).emit("answer", description);
+    socket.to(socketId).emit("answer", socket.id, description);
   });
 
   // Sinalização de áudio: envio dos candidatos de caminho

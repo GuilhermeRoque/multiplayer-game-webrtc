@@ -36,7 +36,6 @@ var gameOver = false;
 var scoreText;
 var jogador;
 var ice_servers = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
-var localConnection;
 var remoteConnections = [];
 var midias;
 var trilha;
@@ -163,7 +162,7 @@ function create() {
           console.log("GOT MEDIA PLAYER 2", stream)
           // RTCPeerConnection: WebRTC connection between the local computer and a remote peer
           // ice_servers: An array of RTCIceServer objects, servers which may be used by the ICE agent; STUN and/or TURN servers.
-          localConnection = new RTCPeerConnection(ice_servers);
+          const localConnection = new RTCPeerConnection(ice_servers);
           midias
             .getTracks()
             // adds a new media track to the set of tracks which will be transmitted to the other peer
@@ -175,7 +174,7 @@ function create() {
             candidate && socket.emit("candidate", jogadores.primeiro, candidate);
           };
 
-          remoteConnections.push({sender: jogador.primeiro, connection:localConnection})
+          remoteConnections.push({sender: jogadores.primeiro, connection: localConnection})
 
           // after a new track has been added to an RTCRtpReceiver which is part of the connection
           localConnection.ontrack = ({ streams }) => {
@@ -232,8 +231,10 @@ function create() {
   });
 
   // player 2 reeiver answer and then connection is established
-  this.socket.on("answer", (description) => {
-    localConnection.setRemoteDescription(description);
+  this.socket.on("answer", (socketId, description) => {
+    let index = remoteConnections.findIndex(conn => {return conn.sender === socketId})
+    console.log(remoteConnections)
+    remoteConnections[index].connection.setRemoteDescription(description);
   });
 
   this.socket.on("candidate", (socketId, candidate) => {
