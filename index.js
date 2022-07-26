@@ -54,70 +54,71 @@ io.on("connection", function (socket) {
   });
 });
 // ----------------------------------------------------------------
-app.set('view engine', 'ejs');
+// app.set('view engine', 'ejs');
 
-app.use(session({
-  resave: false,
-  saveUninitialized: true,
-  secret: 'SECRET' 
-}));
+// app.use(session({
+//   resave: false,
+//   saveUninitialized: true,
+//   secret: 'SECRET' 
+// }));
 
-var passport = require('passport');
-var userProfile; 
-app.use(passport.initialize());
-app.use(passport.session());
+// var passport = require('passport');
+// var userProfile; 
+// app.use(passport.initialize());
+// app.use(passport.session());
 
-app.get('/login', function(req, res) {
-  res.render('pages/auth');
-});
-app.get('/error', (req, res) => res.send("error logging in"));
+// app.get('/login', function(req, res) {
+//   res.render('pages/auth');
+// });
+// app.get('/error', (req, res) => res.send("error logging in"));
 
-passport.serializeUser(function(user, cb) {
-  cb(null, user);
-});
+// passport.serializeUser(function(user, cb) {
+//   cb(null, user);
+// });
  
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
-});
+// passport.deserializeUser(function(obj, cb) {
+//   cb(null, obj);
+// });
 
 
-/*  Google AUTH  */
+// /*  Google AUTH  */
  
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-const GOOGLE_CLIENT_ID = '1063440433438-0mcpenptf78qa4i6vfsvo2rqu45656h0.apps.googleusercontent.com';
-const GOOGLE_CLIENT_SECRET = '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';
+// var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+// const GOOGLE_CLIENT_ID = '1063440433438-0mcpenptf78qa4i6vfsvo2rqu45656h0.apps.googleusercontent.com';
+// const GOOGLE_CLIENT_SECRET = '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';
 
-passport.use(new GoogleStrategy({
-    clientID: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback"
-  },
-  function(accessToken, refreshToken, profile, done) {
-      userProfile=profile;
-      return done(null, userProfile);
-  }
-));
+// passport.use(new GoogleStrategy({
+//     clientID: GOOGLE_CLIENT_ID,
+//     clientSecret: GOOGLE_CLIENT_SECRET,
+//     callbackURL: "/auth/google/callback"
+//   },
+//   function(accessToken, refreshToken, profile, done) {
+//       userProfile=profile;
+//       return done(null, userProfile);
+//   }
+// ));
  
-app.get('/auth/google', 
-  passport.authenticate('google', { scope : ['profile', 'email'] }));
+// app.get('/auth/google', 
+//   passport.authenticate('google', { scope : ['profile', 'email'] }));
  
-app.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/error' }),
-  function(req, res) {
-    // Successful authentication, redirect success.
-    players.push(req.user._json)
-    console.log("Jogadores autenticados: \n", players)
-    res.redirect('/');
-  });
+// app.get('/auth/google/callback', 
+//   passport.authenticate('google', { failureRedirect: '/error' }),
+//   function(req, res) {
+//     // Successful authentication, redirect success.
+//     players.push(req.user._json)
+//     console.log("Jogadores autenticados: \n", players)
+//     res.redirect('/');
+//   });
 
+// app.use((req, res, next)=>{
+//   if(!req.user){
+//     res.redirect('/login')
+//   }else{
+//     next()
+//   }
+// }) 
 // --------------------------------------------------------
-app.use((req, res, next)=>{
-  if(!req.user){
-    res.redirect('/login')
-  }else{
-    next()
-  }
-}) 
+
 app.use(express.static("./cliente"));
   
 server.listen(PORT, () => console.log(`Server listening on port ${PORT}!`));

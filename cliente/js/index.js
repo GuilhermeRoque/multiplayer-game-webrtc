@@ -177,6 +177,8 @@ function create() {
   var socket = this.socket;
 
   this.socket.on("jogadores", function (jogadores) {
+    console.log("jogadores", jogadores)
+    console.log("jogador", self.socket.id)
     if (jogadores.primeiro === self.socket.id) {
       // Define jogador como o primeiro
       jogador = 1;
@@ -193,6 +195,7 @@ function create() {
       // get media streams
         .getUserMedia({ video: false, audio: true })
         .then((stream) => {
+          console.log("GOT MEDIA PLAYER 1", stream)
           midias = stream;
         })
         .catch((error) => console.log(error));
@@ -213,6 +216,7 @@ function create() {
         .getUserMedia({ video: false, audio: true }) 
         .then((stream) => {
           midias = stream;
+          console.log("GOT MEDIA PLAYER 2", stream)
           // RTCPeerConnection: WebRTC connection between the local computer and a remote peer
           // ice_servers: An array of RTCIceServer objects, servers which may be used by the ICE agent; STUN and/or TURN servers.
           localConnection = new RTCPeerConnection(ice_servers);
@@ -228,9 +232,10 @@ function create() {
           };
 
           // after a new track has been added to an RTCRtpReceiver which is part of the connection
-          localConnection.ontrack = ({ streams: [midias] }) => {
-            console.log("MIDIAS", midias);
-            audio.srcObject = midias;
+          localConnection.ontrack = ({ streams }) => {
+            const firstMedia = streams[0]
+            console.log("Player 2 received MEDIIA", firstMedia);
+            audio.srcObject = firstMedia;
           };
 
           localConnection
@@ -250,9 +255,6 @@ function create() {
         })
         .catch((error) => console.log(error));
     }
-
-    // Os dois jogadores estão conectados
-    console.log(jogadores);
   });
 
   // player 1 receives offer
@@ -264,8 +266,10 @@ function create() {
     remoteConnection.onicecandidate = ({ candidate }) => {
       candidate && socket.emit("candidate", socketId, candidate);
     };
-    remoteConnection.ontrack = ({ streams: [midias] }) => {
-      audio.srcObject = midias;
+    remoteConnection.ontrack = ({ streams }) => {
+      const firstMedia = streams[0]
+      console.log("Player 1 received MEDIIA", firstMedia);
+      audio.srcObject = firstMedia;
     };
     remoteConnection
       .setRemoteDescription(description)
