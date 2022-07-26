@@ -26,6 +26,7 @@ var config = {
 
 var player1;
 var player2;
+var player3;
 var stars;
 var bombs;
 var platforms;
@@ -56,6 +57,11 @@ function preload() {
     frameWidth: 45,
     frameHeight: 38,
   });
+  this.load.spritesheet("player3", "assets/dude3.png", {
+    frameWidth: 45,
+    frameHeight: 38,
+  });
+
 }
 
 function create() {
@@ -79,69 +85,15 @@ function create() {
   // The player and its settings
   player1 = this.physics.add.sprite(100, 450, "player1");
   player1.body.setAllowGravity(false);
-
-  this.anims.create({
-    key: "left1",
-    frames: this.anims.generateFrameNumbers("player1", {
-      start: 8,
-      end: 9,
-    }),
-    frameRate: 10,
-    repeat: -1,
-  });
-
-  this.anims.create({
-    key: "turn1",
-    frames: this.anims.generateFrameNumbers("player1", {
-      start: 0,
-      end: 1,
-    }),
-    frameRate: 2,
-    repeat: -1,
-  });
-
-  this.anims.create({
-    key: "right1",
-    frames: this.anims.generateFrameNumbers("player1", {
-      start: 18,
-      end: 19,
-    }),
-    frameRate: 10,
-    repeat: 1,
-  });
+  initPlayer(this.anims, "1");
 
   player2 = this.physics.add.sprite(100, 450, "player2");
   player2.body.setAllowGravity(false);
+  initPlayer(this.anims, "2");
 
-  this.anims.create({
-    key: "left2",
-    frames: this.anims.generateFrameNumbers("player2", {
-      start: 8,
-      end: 9,
-    }),
-    frameRate: 10,
-    repeat: -1,
-  });
-
-  this.anims.create({
-    key: "turn2",
-    frames: this.anims.generateFrameNumbers("player2", {
-      start: 0,
-      end: 1,
-    }),
-    frameRate: 2,
-    repeat: -1,
-  });
-
-  this.anims.create({
-    key: "right2",
-    frames: this.anims.generateFrameNumbers("player2", {
-      start: 18,
-      end: 19,
-    }),
-    frameRate: 10,
-    repeat: 1,
-  });
+  player3 = this.physics.add.sprite(100, 450, "player3");
+  player3.body.setAllowGravity(false);
+  initPlayer(this.anims, "3");
 
   bombs = this.physics.add.group();
   this.physics.add.collider(bombs, platforms);
@@ -184,12 +136,7 @@ function create() {
       jogador = 1;
 
       // Personagens colidem com os limites da cena
-      player1.body.setAllowGravity(true);
-      physics.add.collider(player1, platforms);
-      physics.add.collider(stars, platforms);
-      physics.add.overlap(player1, stars, collectStar, null, this);
-      physics.add.collider(player1, bombs, hitBomb, null, this);
-      player1.setCollideWorldBounds(true);
+      setupPlayer(physics, player1);
 
       navigator.mediaDevices
       // get media streams
@@ -204,11 +151,7 @@ function create() {
       jogador = 2;
 
       // Personagens colidem com os limites da cena
-      player2.body.setAllowGravity(true);
-      physics.add.collider(player2, platforms);
-      physics.add.overlap(player2, stars, collectStar, null, this);
-      physics.add.collider(player2, bombs, hitBomb, null, this);
-      player2.setCollideWorldBounds(true);
+      setupPlayer(physics, player2);
 
       navigator.mediaDevices
         // Media Streams API
@@ -302,6 +245,48 @@ function create() {
       player1.y = y;
     }
   });
+}
+
+function initPlayer(anims, playerIndex) {
+  let playerName = "player"+playerIndex
+  anims.create({
+    key: "left"+playerIndex,
+    frames: anims.generateFrameNumbers(playerName, {
+      start: 8,
+      end: 9,
+    }),
+    frameRate: 10,
+    repeat: -1,
+  });
+
+  anims.create({
+    key: "turn"+playerIndex,
+    frames: anims.generateFrameNumbers(playerName, {
+      start: 0,
+      end: 1,
+    }),
+    frameRate: 2,
+    repeat: -1,
+  });
+
+  anims.create({
+    key: "right"+playerIndex,
+    frames: anims.generateFrameNumbers(playerName, {
+      start: 18,
+      end: 19,
+    }),
+    frameRate: 10,
+    repeat: 1,
+  });
+}
+
+function setupPlayer(physics, player) {
+  player.body.setAllowGravity(true);
+  physics.add.collider(player, platforms);
+  physics.add.collider(stars, platforms);
+  physics.add.overlap(player, stars, collectStar, null, this);
+  physics.add.collider(player, bombs, hitBomb, null, this);
+  player.setCollideWorldBounds(true);
 }
 
 function update() {
