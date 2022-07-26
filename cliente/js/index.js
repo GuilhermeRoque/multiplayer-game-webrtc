@@ -211,6 +211,11 @@ function create() {
             });
         })
         .catch((error) => console.log(error));
+      } else if (jogadores.terceiro === self.socket.id) {
+        // Define jogador como o segundo
+        jogador = 3;
+        // Personagens colidem com os limites da cena
+        setupPlayer(physics, player3);
     }
   });
 
@@ -375,6 +380,25 @@ function update() {
       frame: player2.anims.getFrameName(),
       x: player2.body.x + 20,
       y: player2.body.y + 20,
+    });
+  }else if (jogador === 3) {
+    if (cursors.left.isDown) {
+      player3.setVelocityX(-160);
+      player3.anims.play("left3", true);
+    } else if (cursors.right.isDown) {
+      player3.setVelocityX(160);
+      player3.anims.play("right3", true);
+    } else {
+      player3.setVelocityX(0);
+      player3.anims.play("turn3");
+    }
+    if (cursors.up.isDown && player3.body.touching.down) {
+      player3.setVelocityY(-330);
+    }
+    this.socket.emit("estadoDoJogador", {
+      frame: player3.anims.getFrameName(),
+      x: player3.body.x + 20,
+      y: player3.body.y + 20,
     });
   }
 }
