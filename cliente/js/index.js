@@ -143,7 +143,7 @@ function create() {
       }
     }
 
-    if (jogadores.primeiro === self.socket.id) {
+    if (jogadores.primeiro === self.socket.id & jogador===undefined) {
       // Define jogador como o primeiro
       jogador = 1;
       navigator.mediaDevices
@@ -158,7 +158,7 @@ function create() {
       // Personagens colidem com os limites da cena
       setupPlayer(physics, player1);
 
-    } else if (jogadores.segundo === self.socket.id) {
+    } else if (jogadores.segundo === self.socket.id & jogador===undefined) {
       // Define jogador como o segundo
       jogador = 2;
 
@@ -211,11 +211,58 @@ function create() {
             });
         })
         .catch((error) => console.log(error));
-      } else if (jogadores.terceiro === self.socket.id) {
+      } else if (jogadores.terceiro === self.socket.id & jogador===undefined) {
         // Define jogador como o segundo
         jogador = 3;
         // Personagens colidem com os limites da cena
         setupPlayer(physics, player3);
+
+        navigator.mediaDevices
+        // Media Streams API
+        // method prompts the user for permission to use a media input which produces a MediaStream with tracks(video/audio) containing the requested types of media. 
+        .getUserMedia({ video: false, audio: true }) 
+        .then((stream) => {
+          midias = stream;
+          console.log("GOT MEDIA PLAYER 3", stream)
+          // RTCPeerConnection: WebRTC connection between the local computer and a remote peer
+          // ice_servers: An array of RTCIceServer objects, servers which may be used by the ICE agent; STUN and/or TURN servers.
+          const localConnection = new RTCPeerConnection(ice_servers);
+          midias
+            .getTracks()
+            // adds a new media track to the set of tracks which will be transmitted to the other peer
+            .forEach((track) => localConnection.addTrack(track, midias));
+          
+          // when an RTCIceCandidate has been identified and added to the local peer by a call to RTCPeerConnection.setLocalDescription().
+          localConnection.onicecandidate = ({ candidate }) => {
+            // console.log("ICE_CANDIDATE: ", candidate)
+            candidate && socket.emit("candidate", jogadores.primeiro, candidate);
+          };
+
+          remoteConnections.push({sender: jogadores.primeiro, connection: localConnection})
+
+          // after a new track has been added to an RTCRtpReceiver which is part of the connection
+          localConnection.ontrack = ({ streams }) => {
+            const firstMedia = streams[0]
+            console.log("Player 3 received MEDIA", firstMedia);
+            audio.srcObject = firstMedia;
+          };
+
+          localConnection
+            // initiates the creation of an SDP The SDP offer includes information about any MediaStreamTrack objects already attached to the WebRTC session, codec, and options supported by the browser, and any candidates already gathered by the ICE agent
+            .createOffer()
+            .then((offer) => 
+              //  changes the local description associated with the connection. This description specifies the properties of the local end of the connection, including the media format (session description)
+              localConnection.setLocalDescription(offer)
+            )
+            .then(() => {
+              socket.emit(
+                "offer",
+                jogadores.primeiro,
+                localConnection.localDescription
+              );
+            });
+        })
+        .catch((error) => console.log(error));
     }
   });
 
