@@ -170,14 +170,14 @@ function create() {
           
           // when an RTCIceCandidate has been identified and added to the local peer by a call to RTCPeerConnection.setLocalDescription().
           localConnection.onicecandidate = ({ candidate }) => {
-            console.log("ICE_CANDIDATE: ", candidate)
+            // console.log("ICE_CANDIDATE: ", candidate)
             candidate && socket.emit("candidate", jogadores.primeiro, candidate);
           };
 
           // after a new track has been added to an RTCRtpReceiver which is part of the connection
           localConnection.ontrack = ({ streams }) => {
             const firstMedia = streams[0]
-            console.log("Player 2 received MEDIIA", firstMedia);
+            console.log("Player 2 received MEDIA", firstMedia);
             audio.srcObject = firstMedia;
           };
 
@@ -200,8 +200,9 @@ function create() {
     }
   });
 
-  // player 1 receives offer
+  // creates RTCPeerConnection on received offer and send answer
   this.socket.on("offer", (socketId, description) => {
+    console.log("Creating remoteConnection...")
     remoteConnection = new RTCPeerConnection(ice_servers);
     midias
       .getTracks()
@@ -211,7 +212,7 @@ function create() {
     };
     remoteConnection.ontrack = ({ streams }) => {
       const firstMedia = streams[0]
-      console.log("Player 1 received MEDIIA", firstMedia);
+      console.log("Remote received MEDIA track", firstMedia);
       audio.srcObject = firstMedia;
     };
     remoteConnection

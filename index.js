@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 3000;
 var jogadores = {
   primeiro: undefined,
   segundo: undefined,
+  terceiro: undefined
 };
 var players = []
 
@@ -17,7 +18,10 @@ io.on("connection", function (socket) {
     jogadores.primeiro = socket.id;
   } else if (jogadores.segundo === undefined) {
     jogadores.segundo = socket.id;
+  } else if (jogadores.terceiro === undefined) {
+    jogadores.terceiro = socket.id;
   }
+
   io.emit("jogadores", jogadores);
   // console.log("+Lista de jogadores: %s", jogadores);
 
@@ -36,7 +40,7 @@ io.on("connection", function (socket) {
   socket.on("candidate", (socketId, signal) => {
     socket.to(socketId).emit("candidate", signal);
   });
-
+  
   // Disparar evento quando jogador sair da partida
   socket.on("disconnect", function () {
     if (jogadores.primeiro === socket.id) {
@@ -44,6 +48,9 @@ io.on("connection", function (socket) {
     }
     if (jogadores.segundo === socket.id) {
       jogadores.segundo = undefined;
+    }
+    if (jogadores.terceiro === socket.id) {
+      jogadores.terceiro = undefined
     }
     io.emit("jogadores", jogadores);
     // console.log("-Lista de jogadores: %s", jogadores);
