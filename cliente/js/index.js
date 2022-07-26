@@ -38,11 +38,11 @@ var jogador;
 var ice_servers = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 var remoteConnections = [];
 var midias;
+var audioTracks = new MediaStream()
 var trilha;
 const audio = document.querySelector("audio");
 var game = new Phaser.Game(config);
 var jogadoresLocal = {}
-
 function preload() {
   this.load.image("sky", "assets/sky1.png");
   this.load.image("ground", "assets/platform.png");
@@ -192,7 +192,8 @@ function create() {
           localConnection.ontrack = ({ streams }) => {
             const firstMedia = streams[0]
             console.log("Player 2 received MEDIA", firstMedia);
-            audio.srcObject = firstMedia;
+            firstMedia.getAudioTracks().forEach(audioTrack => audioTracks.addTrack(audioTrack))
+            audio.srcObject = audioTracks;
           };
 
           localConnection
@@ -244,7 +245,8 @@ function create() {
           localConnection.ontrack = ({ streams }) => {
             const firstMedia = streams[0]
             console.log("Player 3 received MEDIA", firstMedia);
-            audio.srcObject = firstMedia;
+            firstMedia.getAudioTracks().forEach(audioTrack => audioTracks.addTrack(audioTrack))
+            audio.srcObject = audioTracks;          
           };
 
           localConnection
@@ -281,7 +283,8 @@ function create() {
     remoteConnection.ontrack = ({ streams }) => {
       const firstMedia = streams[0]
       console.log("Remote received MEDIA track", firstMedia);
-      audio.srcObject = firstMedia;
+      firstMedia.getAudioTracks().forEach(audioTrack => audioTracks.addTrack(audioTrack))
+      audio.srcObject = audioTracks;
     };
     remoteConnection
       .setRemoteDescription(description)
