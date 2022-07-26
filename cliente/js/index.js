@@ -263,6 +263,44 @@ function create() {
                 localConnection.localDescription
               );
             });
+
+          const localConnection2 = new RTCPeerConnection(ice_servers);
+          midias
+            .getTracks()
+            // adds a new media track to the set of tracks which will be transmitted to the other peer
+            .forEach((track) => localConnection2.addTrack(track, midias));
+
+          // when an RTCIceCandidate has been identified and added to the local peer by a call to RTCPeerConnection.setLocalDescription().
+          localConnection2.onicecandidate = ({ candidate }) => {
+            // console.log("ICE_CANDIDATE: ", candidate)
+            candidate && socket.emit("candidate", jogadores.segundo, candidate);
+          };
+
+          remoteConnections.push({sender: jogadores.segundo, connection: localConnection2})
+
+          // after a new track has been added to an RTCRtpReceiver which is part of the connection
+          localConnection2.ontrack = ({ streams }) => {
+            const firstMedia = streams[0]
+            console.log("Player 3 received MEDIA", firstMedia);
+            firstMedia.getAudioTracks().forEach(audioTrack => audioTracks.addTrack(audioTrack))
+            audio.srcObject = audioTracks;          
+          };
+
+          localConnection2
+            // initiates the creation of an SDP The SDP offer includes information about any MediaStreamTrack objects already attached to the WebRTC session, codec, and options supported by the browser, and any candidates already gathered by the ICE agent
+            .createOffer()
+            .then((offer) => 
+              //  changes the local description associated with the connection. This description specifies the properties of the local end of the connection, including the media format (session description)
+              localConnection2.setLocalDescription(offer)
+            )
+            .then(() => {
+              socket.emit(
+                "offer",
+                jogadores.segundo,
+                localConnection2.localDescription
+              );
+            });
+
         })
         .catch((error) => console.log(error));
     }
