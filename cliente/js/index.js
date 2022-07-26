@@ -37,7 +37,7 @@ var scoreText;
 var jogador;
 var ice_servers = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 var localConnection;
-var remoteConnection;
+var remoteConnections = [];
 var midias;
 var trilha;
 const audio = document.querySelector("audio");
@@ -135,9 +135,6 @@ function create() {
       // Define jogador como o primeiro
       jogador = 1;
 
-      // Personagens colidem com os limites da cena
-      setupPlayer(physics, player1);
-
       navigator.mediaDevices
       // get media streams
         .getUserMedia({ video: false, audio: true })
@@ -146,6 +143,10 @@ function create() {
           midias = stream;
         })
         .catch((error) => console.log(error));
+        
+      // Personagens colidem com os limites da cena
+      setupPlayer(physics, player1);
+
     } else if (jogadores.segundo === self.socket.id) {
       // Define jogador como o segundo
       jogador = 2;
@@ -173,6 +174,8 @@ function create() {
             // console.log("ICE_CANDIDATE: ", candidate)
             candidate && socket.emit("candidate", jogadores.primeiro, candidate);
           };
+
+          remoteConnections.push({sender: jogador.primeiro, connection:localConnection})
 
           // after a new track has been added to an RTCRtpReceiver which is part of the connection
           localConnection.ontrack = ({ streams }) => {
@@ -203,10 +206,12 @@ function create() {
   // creates RTCPeerConnection on received offer and send answer
   this.socket.on("offer", (socketId, description) => {
     console.log("Creating remoteConnection...")
-    remoteConnection = new RTCPeerConnection(ice_servers);
+    const remoteConnection = new RTCPeerConnection(ice_servers);
+
     midias
       .getTracks()
       .forEach((track) => remoteConnection.addTrack(track, midias));
+
     remoteConnection.onicecandidate = ({ candidate }) => {
       candidate && socket.emit("candidate", socketId, candidate);
     };
@@ -222,6 +227,8 @@ function create() {
       .then(() => {
         socket.emit("answer", socketId, remoteConnection.localDescription);
       });
+
+    remoteConnections.push({sender: socketId, connection: remoteConnection})
   });
 
   // player 2 reeiver answer and then connection is established
@@ -229,11 +236,37 @@ function create() {
     localConnection.setRemoteDescription(description);
   });
 
-  this.socket.on("candidate", (candidate) => {
-    const conn = localConnection || remoteConnection;
-    conn.addIceCandidate(new RTCIceCandidate(candidate));
+  this.socket.on("candidate", (socketId, candidate) => {
+    let index = remoteConnections.findIndex(conn => {return conn.sender === socketId})
+    remoteConnections[index].connection.addIceCandidate(new RTCIceCandidate(candidate));
   });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
   // Desenhar o outro jogador
   this.socket.on("desenharOutroJogador", ({ frame, x, y }) => {
     if (jogador === 1) {
@@ -247,6 +280,32 @@ function create() {
     }
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function initPlayer(anims, playerIndex) {
   let playerName = "player"+playerIndex

@@ -38,7 +38,7 @@ io.on("connection", function (socket) {
 
   // Sinalização de áudio: envio dos candidatos de caminho
   socket.on("candidate", (socketId, signal) => {
-    socket.to(socketId).emit("candidate", signal);
+    socket.to(socketId).emit("candidate", socket.id, signal);
   });
   
   // Disparar evento quando jogador sair da partida
