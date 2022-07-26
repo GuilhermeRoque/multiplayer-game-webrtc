@@ -57,7 +57,7 @@ io.on("connection", function (socket) {
   });
 
   socket.on("estadoDoJogador", function (estado) {
-    socket.broadcast.emit("desenharOutroJogador", estado);
+    socket.broadcast.emit("desenharOutroJogador", socket.id, estado);
   });
 });
 // ----------------------------------------------------------------

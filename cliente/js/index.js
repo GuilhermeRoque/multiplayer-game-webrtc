@@ -41,6 +41,7 @@ var midias;
 var trilha;
 const audio = document.querySelector("audio");
 var game = new Phaser.Game(config);
+var jogadoresLocal = {}
 
 function preload() {
   this.load.image("sky", "assets/sky1.png");
@@ -130,10 +131,21 @@ function create() {
   this.socket.on("jogadores", function (jogadores) {
     console.log("jogadores", jogadores)
     console.log("jogador", self.socket.id)
+    for(const [key, value] of Object.entries(jogadores)){
+      if (key=='primeiro'){
+        jogadoresLocal[value] = player1
+      }
+      else if (key=='segundo'){
+        jogadoresLocal[value] = player2
+      }
+      else if (key=='terceiro'){
+        jogadoresLocal[value] = player3
+      }
+    }
+
     if (jogadores.primeiro === self.socket.id) {
       // Define jogador como o primeiro
       jogador = 1;
-
       navigator.mediaDevices
       // get media streams
         .getUserMedia({ video: false, audio: true })
@@ -269,44 +281,12 @@ function create() {
 
   
   // Desenhar o outro jogador
-  this.socket.on("desenharOutroJogador", ({ frame, x, y }) => {
-    if (jogador === 1) {
-      player2.setFrame(frame);
-      player2.x = x;
-      player2.y = y;
-    } else if (jogador === 2) {
-      player1.setFrame(frame);
-      player1.x = x;
-      player1.y = y;
-    }
+  this.socket.on("desenharOutroJogador", (socketId, { frame, x, y }) => {
+    jogadoresLocal[socketId].setFrame(frame)
+    jogadoresLocal[socketId].x = x
+    jogadoresLocal[socketId].y = y
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function initPlayer(anims, playerIndex) {
   let playerName = "player"+playerIndex
