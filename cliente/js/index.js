@@ -121,7 +121,7 @@ function create() {
   this.physics.add.collider(stars, platforms, null, null, this);
 
   // Conectar no servidor via WebSocket
-  this.socket = io();
+  this.socket = io("https://ifsc.cloud", {path:"/roque/socket.io/", transports:['websocket']});
 
   // Disparar evento quando jogador entrar na partida
   var self = this;
